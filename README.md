@@ -1426,7 +1426,7 @@ This project demonstrates practical understanding of:
 
 ---
 
-# Viva-Ready Architecture Explanation
+# Architecture Explanation
 
 A concise explanation for project demonstration:
 

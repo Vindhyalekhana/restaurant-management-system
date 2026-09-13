@@ -1,29 +1,45 @@
 # Restaurant Table Reservation & Food Service Management System
 
-> A database-driven restaurant management system that handles reservations, table allocation, orders, kitchen operations, billing, payments, and analytical reports through a Python CLI application backed by MySQL.
+> A database-driven restaurant management system for reservations, table allocation, food ordering, kitchen processing, billing, payments, discounts, and operational reporting using Python, Flask, JavaScript, and MySQL.
 
 ---
 
 ## Overview
 
-The **Restaurant Table Reservation & Food Service Management System** is a Python + MySQL application designed to manage the complete operational workflow of a restaurant.
+The **Restaurant Table Reservation & Food Service Management System** manages the complete operational workflow of a restaurant through a relational MySQL database and a layered Python application.
 
-The system connects the customer reservation process with restaurant tables, waiters, food orders, kitchen tickets, billing, discounts, and payments while enforcing business rules at the database level.
+The system connects:
 
-The project focuses on:
+- Customers
+- Dining areas and restaurant tables
+- Reservations
+- Waiters
+- Menu items
+- Orders and order items
+- Kitchen tickets
+- Discounts
+- Bills
+- Payments
+- Operational reports
 
-- Relational database design
-- Referential integrity
-- SQL constraints
-- Database triggers
-- Stored procedures
-- Transactions
-- Python service-layer architecture
-- Historical item pricing
-- Kitchen workflow management
-- Billing and payment validation
-- Operational reporting
-- Negative/error-case testing
+The project was developed as an academic DBMS project with emphasis on relational database design, integrity enforcement, transactions, business-rule validation, and practical application integration.
+
+---
+
+## Objectives
+
+The main objectives are to:
+
+1. Design a normalized relational database for restaurant operations.
+2. Manage table reservations and availability.
+3. Support both reservation-linked and walk-in orders.
+4. Capture food orders and historical item prices.
+5. Track kitchen processing from queued to served.
+6. Generate bills with discounts and tax calculations.
+7. Process and validate payments.
+8. Provide operational reports using SQL queries and aggregations.
+9. Enforce important business rules using constraints, triggers, stored procedures, and transactions.
+10. Provide both CLI and web-based interfaces over the same service and database layers.
 
 ---
 
@@ -37,8 +53,8 @@ The project focuses on:
 - Cancel reservations
 - Validate table capacity
 - Prevent overlapping reservations
-- Associate customers with restaurant tables
-- Support special requests
+- Associate customers with tables
+- Store special requests
 
 ### Order Management
 
@@ -55,113 +71,128 @@ The project focuses on:
 
 ### Kitchen Management
 
-- Automatically create kitchen tickets for new orders
-- Queue orders
-- Mark orders as preparing
-- Mark orders as ready
-- Mark orders as served
-- Track kitchen preparation times
+- Automatically create a kitchen ticket when an order is created
+- View queued and active kitchen tickets
+- Move tickets through the controlled workflow:
+  `Queued → Preparing → Ready → Served`
+- Record kitchen ready time
+- Track preparation delays
 
 ### Billing
 
-- Generate bills from orders
+- Generate bills only for closed orders
 - Calculate subtotal
-- Apply discounts
+- Apply authorized discounts
 - Calculate tax
 - Calculate final total
-- View bills
-- Prevent modification of paid bills
+- View bills and billing history
+- Protect paid bills from modification
 
 ### Payment
 
-- Support:
-  - Cash
-  - Card
-  - UPI
-
+- Support Cash, Card, and UPI
 - Validate exact payment amount
-
 - Prevent payment of already-paid bills
-
-- Automatically mark bills as paid
-
-- Record payment timestamps
+- Record payment time
+- Mark bills as Paid through transactional processing
 
 ### Reports
 
-The application provides reports for:
+The application provides seven operational reports:
 
-- Available tables
-- Table turnover
-- Waiter performance
-- Item sales
-- Kitchen delays
-- Discount usage
-- Revenue
+1. Available Tables
+2. Table Turnover
+3. Waiter Performance
+4. Item Sales
+5. Kitchen Delays
+6. Discount Usage
+7. Revenue
 
 ---
 
-# System Architecture
+## System Architecture
 
-The project follows a layered architecture:
+The project follows a layered architecture. The CLI and web interface act as presentation layers and reuse the same application services and database layer.
 
 ```text
-┌──────────────────────────────────────────┐
-│              CLI / UI Layer              │
-│             application/ui               │
-│                 cli.py                   │
-└────────────────────┬─────────────────────┘
-                     │
-                     ▼
-┌──────────────────────────────────────────┐
-│              Service Layer               │
-│                                          │
-│ ReservationService                       │
-│ OrderService                             │
-│ KitchenService                           │
-│ BillingService                           │
-│ PaymentService                            │
-│ ReportService                             │
-└────────────────────┬─────────────────────┘
-                     │
-                     ▼
-┌──────────────────────────────────────────┐
-│             Database Layer               │
-│                                          │
-│ get_connection()                         │
-│ execute_query()                          │
-│ execute_procedure()                      │
-└────────────────────┬─────────────────────┘
-                     │
-                     ▼
-┌──────────────────────────────────────────┐
-│                 MySQL                    │
-│                                          │
-│ Tables                                   │
-│ Constraints                              │
-│ Triggers                                 │
-│ Stored Procedures                        │
-│ Transactions                             │
-└──────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│             Presentation Layer               │
+│                                              │
+│     CLI                Flask Web UI          │
+│  application/ui       HTML / CSS / JS        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│              Flask API / Routes              │
+│              application/web                 │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│                Service Layer                 │
+│                                              │
+│ ReservationService                           │
+│ OrderService                                 │
+│ KitchenService                               │
+│ BillingService                               │
+│ PaymentService                               │
+│ ReportService                                │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│                Database Layer                │
+│                                              │
+│ get_connection()                             │
+│ execute_query()                              │
+│ execute_procedure()                          │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│                    MySQL                     │
+│                                              │
+│ Tables • Constraints • Foreign Keys          │
+│ Triggers • Stored Procedures • Transactions  │
+└──────────────────────────────────────────────┘
 ```
 
+### Web Application Flow
+
+```text
+HTML / CSS / JavaScript
+          ↓
+      Flask Routes
+          ↓
+    Service Layer
+          ↓
+      MySQL DB
+```
+
+The web frontend does not duplicate the core business logic. It communicates with the Flask API, which delegates operations to the existing service layer.
+
 ---
 
-# Technology Stack
+## Technology Stack
 
-| Technology               | Purpose                           |
-| ------------------------ | --------------------------------- |
-| Python                   | Application logic                 |
-| MySQL                    | Relational database               |
-| `mysql-connector-python` | Python–MySQL connectivity         |
-| SQL                      | Database operations               |
-| Stored Procedures        | Transactional database operations |
-| Triggers                 | Business-rule enforcement         |
-| Git/GitHub               | Version control                   |
+| Technology               | Purpose                                   |
+| ------------------------ | ----------------------------------------- |
+| Python 3.x               | Application and service logic             |
+| Flask                    | Web application and API layer             |
+| HTML                     | Web page structure                        |
+| CSS                      | Web interface styling                     |
+| JavaScript               | Web interaction and API communication     |
+| MySQL 9.x                | Relational database                       |
+| `mysql-connector-python` | Python–MySQL connectivity                 |
+| SQL                      | Database operations, reports, constraints |
+| Stored Procedures        | Transactional database operations         |
+| Triggers                 | Database-level business-rule enforcement  |
+| Git/GitHub               | Version control and project hosting       |
 
 ---
 
-# Project Structure
+## Project Structure
 
 ```text
 Restaurant Table Reservation & Food Service Management System/
@@ -176,14 +207,35 @@ Restaurant Table Reservation & Food Service Management System/
 │   │   ├── order_service.py
 │   │   ├── kitchen_service.py
 │   │   ├── billing_service.py
-│   │   ├── payment_service.py
-│   │   └── ...
+│   │   └── payment_service.py
 │   │
 │   ├── reports/
 │   │   └── report_service.py
 │   │
-│   └── ui/
-│       └── cli.py
+│   ├── ui/
+│   │   └── cli.py
+│   │
+│   └── web/
+│       ├── __init__.py
+│       ├── routes.py
+│       ├── templates/
+│       │   ├── base.html
+│       │   ├── dashboard.html
+│       │   ├── reservations.html
+│       │   ├── tables.html
+│       │   ├── orders.html
+│       │   ├── kitchen.html
+│       │   ├── billing.html
+│       │   └── reports.html
+│       │
+│       └── static/
+│           ├── css/
+│           │   └── style.css
+│           └── js/
+│               ├── reservations.js
+│               ├── orders.js
+│               ├── kitchen.js
+│               └── billing.js
 │
 ├── database/
 │   ├── 01_schema.sql
@@ -196,89 +248,79 @@ Restaurant Table Reservation & Food Service Management System/
 └── requirements.txt
 ```
 
-> The exact file list may vary depending on the final project directory. The database scripts shown above reflect the project files and commands used during implementation.
-
 ---
 
 # Database Design
 
-The system uses a relational database named:
+The system uses the MySQL database:
 
 ```sql
 restaurant_db
 ```
 
-The main entities are:
+### Main Entity Relationships
 
 ```text
 CUSTOMER
     │
-    └── RESERVATION
-             │
-             └── RESTAURANT_TABLE
-                      │
-                      └── DINING_AREA
+    └── RESERVATION ─── RESTAURANT_TABLE ─── DINING_AREA
 
 WAITER
     │
     └── RESTAURANT_ORDER
-             │
-             ├── ORDER_ITEM ─── MENU_ITEM
-             │
-             └── KITCHEN_TICKET
-             │
-             └── BILL
+            │
+            ├── ORDER_ITEM ─── MENU_ITEM
+            │
+            └── KITCHEN_TICKET
                     │
-                    └── PAYMENT
+                    └── operational status tracking
 
-DISCOUNT
+RESTAURANT_ORDER
     │
-    └── BILL
+    └── BILL ─── PAYMENT
+          │
+          └── DISCOUNT
 ```
 
----
-
-# Main Database Entities
-
-## CUSTOMER
-
-Stores restaurant customers.
-
-Typical information includes:
-
-- Customer ID
-- First name
-- Last name
-- Phone number
-- Email
-- Registration date
+The design separates independent entities and relationship data to reduce redundancy and maintain referential integrity.
 
 ---
 
-## DINING_AREA
+## Main Database Entities
 
-Represents different areas of the restaurant.
+### CUSTOMER
 
-Example areas:
+Stores restaurant customer information.
+
+Typical attributes:
+
+- `customer_id`
+- `first_name`
+- `last_name`
+- `phone`
+- `email`
+- `registration_date`
+
+### DINING_AREA
+
+Represents restaurant areas such as:
 
 - Indoor Dining
 - Outdoor Dining
 - Family Dining
 - Private Dining
 
----
+### RESTAURANT_TABLE
 
-## RESTAURANT_TABLE
+Stores restaurant table information.
 
-Stores individual restaurant tables.
+Important attributes:
 
-Important attributes include:
-
-- Table ID
-- Dining area
-- Table number
-- Capacity
-- Status
+- `table_id`
+- `area_id`
+- `table_number`
+- `capacity`
+- `status`
 
 Example statuses:
 
@@ -289,37 +331,31 @@ Reserved
 Maintenance
 ```
 
----
+### WAITER
 
-## WAITER
+Stores waiter information including:
 
-Stores restaurant waiter information.
+- `waiter_id`
+- `first_name`
+- `last_name`
+- `phone`
+- `hire_date`
+- `status`
 
-Important attributes:
-
-- Waiter ID
-- First name
-- Last name
-- Phone number
-- Hire date
-- Status
-
----
-
-## MENU_ITEM
+### MENU_ITEM
 
 Stores food and beverage items.
 
-Important attributes:
+Attributes:
 
-- Item ID
-- Name
-- Description
-- Category
-- Price
-- Availability
+- `item_id`
+- `name`
+- `description`
+- `category`
+- `price`
+- `is_available`
 
-Example categories:
+Categories include:
 
 ```text
 Starter
@@ -328,36 +364,32 @@ Dessert
 Beverage
 ```
 
----
-
-## DISCOUNT
+### DISCOUNT
 
 Stores discount offers.
 
 Attributes include:
 
-- Discount ID
-- Discount name
-- Percentage
-- Active/inactive status
+- `discount_id`
+- `discount_name`
+- `percentage`
+- `is_active`
 
----
-
-## RESERVATION
+### RESERVATION
 
 Stores customer table reservations.
 
 Important attributes:
 
-- Reservation ID
-- Customer ID
-- Table ID
-- Reservation date
-- Start time
-- End time
-- Guest count
-- Status
-- Special requests
+- `reservation_id`
+- `customer_id`
+- `table_id`
+- `reservation_date`
+- `start_time`
+- `end_time`
+- `guest_count`
+- `status`
+- `special_requests`
 
 Reservation statuses include:
 
@@ -368,76 +400,63 @@ Seated
 Cancelled
 ```
 
----
-
-## RESTAURANT_ORDER
+### RESTAURANT_ORDER
 
 Stores restaurant orders.
 
-An order may either:
+An order can either:
 
 - reference a reservation, or
-- represent a walk-in order using `reservation_id = NULL`.
+- represent a walk-in order with `reservation_id = NULL`.
 
-Important attributes include:
+Important attributes:
 
-- Order ID
-- Reservation ID
-- Table ID
-- Waiter ID
-- Order date
-- Order time
-- Status
+- `order_id`
+- `reservation_id`
+- `table_id`
+- `waiter_id`
+- `order_date`
+- `order_time`
+- `status`
 
----
+### ORDER_ITEM
 
-## ORDER_ITEM
+Represents the items contained in an order.
 
-Acts as the relationship between orders and menu items.
+Attributes:
 
-It stores:
+- `order_item_id`
+- `order_id`
+- `item_id`
+- `quantity`
+- `unit_price`
+- `special_instructions`
 
-- Order item ID
-- Order ID
-- Item ID
-- Quantity
-- Unit price
-- Special instructions
+#### Historical Pricing
 
-### Historical Pricing
-
-The system deliberately stores the price in:
+The system stores the transaction price in:
 
 ```text
 ORDER_ITEM.unit_price
 ```
 
-instead of always reading the current price from `MENU_ITEM`.
+instead of relying only on the current `MENU_ITEM.price`.
 
-For example:
+This means an old order can retain the price applicable when it was created, even if the menu price changes later.
 
-```text
-Menu price today:       ₹280
-Historical order price: ₹250
-```
+### KITCHEN_TICKET
 
-The order can therefore retain its original transaction price even if the menu price changes later.
+Tracks kitchen processing.
 
----
+Attributes:
 
-## KITCHEN_TICKET
+- `ticket_id`
+- `order_id`
+- `generated_time`
+- `ready_time`
+- `status`
 
-Tracks kitchen processing for orders.
-
-Important fields include:
-
-- Ticket ID
-- Order ID
-- Generated time
-- Ready time
-- Status
-
-Kitchen statuses include:
+Kitchen states:
 
 ```text
 Queued
@@ -446,25 +465,23 @@ Ready
 Served
 ```
 
----
+### BILL
 
-## BILL
+Stores financial information for an order.
 
-Stores financial information associated with an order.
+Attributes include:
 
-Important attributes:
-
-- Bill ID
-- Order ID
-- Discount ID
-- Authorizing waiter
-- Generation time
-- Closed time
-- Subtotal
-- Discount amount
-- Tax amount
-- Total amount
-- Status
+- `bill_id`
+- `order_id`
+- `discount_id`
+- `authorized_by_waiter_id`
+- `generation_time`
+- `closed_time`
+- `subtotal`
+- `discount_amount`
+- `tax_amount`
+- `total_amount`
+- `status`
 
 Bill statuses:
 
@@ -473,19 +490,17 @@ Unpaid
 Paid
 ```
 
----
-
-## PAYMENT
+### PAYMENT
 
 Stores completed payments.
 
-Important attributes:
+Attributes include:
 
-- Payment ID
-- Bill ID
-- Payment time
-- Payment method
-- Amount paid
+- `payment_id`
+- `bill_id`
+- `payment_time`
+- `payment_method`
+- `amount_paid`
 
 Supported methods:
 
@@ -499,9 +514,7 @@ UPI
 
 # Database Integrity
 
-The project does not depend solely on Python validation.
-
-Business rules are enforced at multiple levels:
+The system uses defense in depth for data integrity:
 
 ```text
 Application Validation
@@ -517,15 +530,15 @@ Stored Procedures
 Transactions
 ```
 
-This provides defense in depth for data integrity.
+This means important rules are not dependent only on the frontend or Python application.
 
 ---
 
-# Important Constraints
-
-The project includes database constraints for rules such as:
+## Important Constraints
 
 ### Order Quantity
+
+Order quantity must be positive:
 
 ```text
 quantity > 0
@@ -534,45 +547,36 @@ quantity > 0
 Invalid values such as:
 
 ```text
--1
 0
+-1
 ```
 
-are rejected by:
+are rejected by the database constraint:
 
 ```text
 chk_order_quantity
 ```
 
-### Unit Price
-
-Order item prices cannot be negative.
-
 ### Referential Integrity
 
-Foreign keys prevent references to non-existent:
+Foreign keys prevent references to non-existent entities such as:
 
 - Customers
 - Tables
+- Reservations
 - Orders
 - Menu items
+- Waiters
 - Bills
 - Payments
-- Reservations
-- Waiters
 
 ---
 
 # Database Triggers
 
-## Reservation Capacity
+### Reservation Capacity
 
-```text
-trg_reservation_capacity_insert
-trg_reservation_capacity_update
-```
-
-These triggers prevent a reservation from exceeding the capacity of its assigned table.
+Reservation capacity triggers prevent a reservation from exceeding the assigned table capacity.
 
 Example:
 
@@ -583,49 +587,28 @@ Guest count    = 5
 Reservation rejected
 ```
 
----
+### Order/Reservation Consistency
 
-## Order/Reservation Consistency
-
-```text
-trg_order_consistency_insert
-trg_order_consistency_update
-```
-
-Ensures that an order associated with a reservation uses the same table as the reservation.
+Order consistency triggers ensure that when an order is linked to a reservation, the order uses the same table associated with that reservation.
 
 Example:
 
 ```text
-Reservation 5 → Table 7
-Order         → Table 5
-
-Result:
+Reservation → Table 7
+Order       → Table 5
+        ↓
 Order rejected
 ```
 
----
-
-## Discount Authorization
-
-```text
-trg_discount_auth_insert
-trg_discount_auth_update
-```
+### Discount Authorization
 
 When a discount is applied:
 
 1. The discount must be active.
 2. An authorizing waiter must be specified.
-3. The waiter must be active.
+3. The authorizing waiter must be active.
 
----
-
-## Paid Bill Immutability
-
-```text
-trg_bill_immutability_update
-```
+### Paid Bill Immutability
 
 Once a bill is marked:
 
@@ -633,9 +616,7 @@ Once a bill is marked:
 Paid
 ```
 
-it cannot be modified.
-
-This protects financial records from accidental or unauthorized changes.
+the system prevents modification of the paid financial record.
 
 ---
 
@@ -643,49 +624,37 @@ This protects financial records from accidental or unauthorized changes.
 
 ## `sp_create_reservation`
 
-Responsible for controlled reservation creation.
+The reservation procedure performs controlled reservation creation by:
 
-The procedure:
-
-1. Starts a transaction.
-2. Locks the relevant table row.
-3. Checks table capacity.
-4. Checks reservation overlap.
-5. Inserts the reservation.
-6. Commits the transaction.
+1. Starting a transaction.
+2. Locking the relevant table row.
+3. Checking table capacity.
+4. Checking reservation overlap.
+5. Inserting the reservation.
+6. Committing the transaction.
 
 If validation fails, the transaction is rolled back.
 
----
-
 ## `sp_process_payment`
 
-Responsible for payment processing.
+The payment procedure performs transactional payment processing by:
 
-The procedure:
+1. Starting a transaction.
+2. Locking the bill.
+3. Checking bill status.
+4. Validating the payment amount.
+5. Inserting the payment.
+6. Marking the bill as `Paid`.
+7. Recording the closing timestamp.
+8. Committing the transaction.
 
-1. Starts a transaction.
-2. Locks the bill.
-3. Checks the bill status.
-4. Validates the payment amount.
-5. Inserts the payment.
-6. Changes the bill status to `Paid`.
-7. Records the closing timestamp.
-8. Commits the transaction.
-
-If any validation fails:
-
-```text
-ROLLBACK
-```
-
-is performed.
+If validation fails, the operation is rolled back.
 
 ---
 
 # Transaction Flow
 
-A typical successful transaction follows:
+A typical successful restaurant transaction follows:
 
 ```text
 Customer
@@ -697,6 +666,8 @@ Restaurant Order
 Order Items
    ↓
 Kitchen Ticket
+   ↓
+Queued → Preparing → Ready → Served
    ↓
 Order Closed
    ↓
@@ -725,47 +696,43 @@ execute_query()
 execute_procedure()
 ```
 
-### `execute_query()`
+The database layer provides a common interface for:
 
-Provides a common interface for:
+- `SELECT`
+- `INSERT`
+- `UPDATE`
+- `DELETE`
+- Stored procedure execution
 
-- SELECT
-- INSERT
-- UPDATE
-- DELETE
-
-It also:
-
-- creates a connection,
-- executes parameterized SQL,
-- commits successful changes,
-- rolls back failed transactions,
-- closes the cursor,
-- closes the database connection.
+Successful operations are committed, failed operations are rolled back, and database resources are closed appropriately.
 
 ### Parameterized Queries
 
-The project uses parameterized queries such as:
+The project uses parameterized SQL:
 
 ```python
 cursor.execute(query, params)
 ```
 
-instead of directly concatenating user input into SQL.
-
-This is important for security and reliability.
+instead of directly concatenating user input into SQL statements.
 
 ---
 
-# Order Service
+# Service Layer
 
-The main order functionality is implemented through:
+Business logic is separated into service modules:
 
 ```text
-application/services/order_service.py
+application/services/
 ```
 
-The service handles:
+### ReservationService
+
+Handles reservation creation, availability, viewing, and cancellation.
+
+### OrderService
+
+Handles:
 
 ```text
 create_order()
@@ -774,237 +741,149 @@ view_order()
 close_order()
 ```
 
-The service layer communicates with MySQL through:
+When an order is created, a kitchen ticket is created in the same operation.
 
-```python
-execute_query()
-```
+### KitchenService
 
----
-
-# Kitchen Integration
-
-When an order is created, the application also creates its kitchen ticket.
-
-The verified example was:
+Controls the valid kitchen state transitions:
 
 ```text
-Order ID       : 20
-Kitchen Ticket : 19
-Kitchen Status : Queued
+Queued → Preparing
+Preparing → Ready
+Ready → Served
 ```
 
-The ticket was then successfully moved through:
+### BillingService
 
-```text
-Queued
-   ↓
-Preparing
-   ↓
-Ready
-   ↓
-Served
-```
+Handles:
 
----
-
-# Billing Calculation
-
-The system calculates:
-
-```text
-Total Amount =
-Subtotal - Discount Amount + Tax Amount
-```
-
-Example from the verified transaction:
-
-```text
-Subtotal       = ₹280.00
-Discount       = ₹0.00
-Tax            = ₹14.00
------------------------
-Total          = ₹294.00
-```
-
----
-
-# Verified End-to-End Transaction
-
-One complete transaction was successfully tested using **Order 20**.
-
-```text
-Order ID       : 20
-Table ID       : 5
-Waiter         : Arjun Rao
-
-Order Item:
-Veg Biryani × 1
-Unit Price: ₹280.00
-
-Kitchen Ticket:
-Ticket ID: 19
-Final Status: Served
-
-Bill:
-Bill ID: 17
-Subtotal: ₹280.00
-Tax: ₹14.00
-Total: ₹294.00
-Status: Paid
-
-Payment:
-Payment ID: 16
-Method: UPI
-Amount: ₹294.00
-```
-
-This transaction demonstrates the complete operational lifecycle:
-
-```text
-Order
- ↓
-Kitchen
- ↓
-Billing
- ↓
-Payment
-```
-
----
-
-# Testing & Validation
-
-The system was tested using both positive and negative test cases.
-
-## Positive Tests
-
-- Valid order creation
-- Valid order item insertion
-- Order retrieval
-- Order closing
-- Kitchen ticket creation
-- Kitchen status transitions
 - Bill generation
-- Payment processing
-- Correct bill calculation
+- Historical order totals
+- Discount validation
+- Tax calculation
+- Final bill creation
 
-## Negative Tests
+### PaymentService
 
-### Invalid Quantity
+Handles transactional payment processing and bill status updates.
 
-```text
-Quantity = -1
-```
+### ReportService
 
-Result:
-
-```text
-Rejected
-```
-
-### Zero Quantity
-
-```text
-Quantity = 0
-```
-
-Result:
-
-```text
-Rejected
-```
-
-### Unavailable Menu Item
-
-Mutton Curry was configured as unavailable.
-
-Result:
-
-```text
-Rejected
-```
-
-### Capacity Violation
-
-A reservation exceeding table capacity was attempted.
-
-Result:
-
-```text
-Rejected
-```
-
-### Overlapping Reservation
-
-A reservation overlapping an existing reservation was attempted.
-
-Result:
-
-```text
-Rejected
-```
-
-### Order/Reservation Mismatch
-
-An order was deliberately created using a table different from its reservation.
-
-Result:
-
-```text
-Rejected
-```
-
-### Paid Bill Modification
-
-A paid bill was deliberately modified.
-
-Result:
-
-```text
-Rejected
-```
+Provides SQL-based operational reports for tables, orders, waiters, menu sales, kitchen delays, discounts, and revenue.
 
 ---
 
-# Final Database Audit
+# Web Application
 
-After testing, consistency checks were executed.
+The project includes a Flask-based web interface in addition to the CLI.
 
-| Audit                       | Result |
-| --------------------------- | -----: |
-| Orphan reservations         |    `0` |
-| Invalid order items         |    `0` |
-| Orphan order items          |    `0` |
-| Paid bills without payment  |    `0` |
-| Unpaid bills with payment   |    `0` |
-| Incorrect bill calculations |    `0` |
-
-The bill calculation validation returned:
+### Web Pages
 
 ```text
-Empty set
+Dashboard
+Reservations
+Tables
+Orders
+Kitchen
+Billing
+Reports
 ```
 
-which means no bill violated the expected calculation.
+The frontend communicates with Flask JSON APIs and reuses the existing service layer.
+
+### Main Workflow
+
+```text
+Reservations
+     ↓
+Orders
+     ↓
+Kitchen
+     ↓
+Billing
+     ↓
+Payment
+     ↓
+Reports
+```
+
+The web application provides separate pages for each major operational area instead of placing the complete system on one long page.
 
 ---
 
-# Final Database State After Testing
+# CLI Application
 
-The final verified database contained:
+The original CLI interface remains available as a separate presentation layer.
 
-| Entity            | Records |
-| ----------------- | ------: |
-| Customers         |      18 |
-| Reservations      |      22 |
-| Restaurant Orders |      20 |
-| Order Items       |      37 |
-| Kitchen Tickets   |      19 |
-| Bills             |      17 |
-| Payments          |      16 |
+Run it with:
 
-The additional records were generated during application testing.
+```powershell
+python -m application.app
+```
+
+The CLI provides modules for:
+
+```text
+1. Reservation Management
+2. Order Management
+3. Kitchen Management
+4. Billing & Payment
+5. Reports
+0. Exit
+```
+
+### Reservation Management
+
+```text
+1. Check Table Availability
+2. Create Reservation
+3. View Reservations
+4. Cancel Reservation
+0. Back
+```
+
+### Order Management
+
+```text
+1. Create Order
+2. Add Order Item
+3. View Order
+4. Close Order
+0. Back
+```
+
+### Kitchen Management
+
+```text
+1. View Queued Tickets
+2. View Active/Preparing Tickets
+3. Mark Preparing
+4. Mark Ready
+5. Mark Served
+0. Back
+```
+
+### Billing & Payment
+
+```text
+1. Generate Bill
+2. View Bill
+3. Process Payment
+0. Back
+```
+
+### Reports
+
+```text
+1. Available Tables
+2. Table Turnover
+3. Waiter Performance
+4. Item Sales
+5. Kitchen Delays
+6. Discount Usage
+7. Revenue
+0. Back
+```
 
 ---
 
@@ -1041,18 +920,16 @@ Open MySQL:
 mysql -u root -p
 ```
 
-Create/use the database according to the project's SQL scripts.
-
-At minimum:
+Create the database if required:
 
 ```sql
 CREATE DATABASE restaurant_db;
 USE restaurant_db;
 ```
 
-Then execute the database scripts in their intended order.
+Execute the database scripts in their dependency order. The project database directory contains schema, constraints, advanced integrity objects, and sample data scripts.
 
-For example:
+Example:
 
 ```text
 database/
@@ -1063,13 +940,11 @@ database/
 └── 06_sample_data.sql
 ```
 
-The exact execution order should follow the dependencies between the schema, constraints, advanced integrity objects, and sample data.
-
 ---
 
 # Python Environment
 
-From the project directory:
+From the project root:
 
 ```powershell
 cd "C:\Users\vindh\Desktop\projects\Restaurant Table Reservation & Food Service Management System"
@@ -1078,26 +953,32 @@ cd "C:\Users\vindh\Desktop\projects\Restaurant Table Reservation & Food Service 
 Install dependencies:
 
 ```powershell
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-If `mysql-connector-python` is not already listed in `requirements.txt`:
+If the MySQL connector is not already installed:
 
 ```powershell
-pip install mysql-connector-python
+python -m pip install mysql-connector-python
+```
+
+Flask is required for the web interface:
+
+```powershell
+python -m pip install flask
 ```
 
 ---
 
 # Database Configuration
 
-Database credentials are loaded through:
+Database configuration is stored in:
 
 ```text
 application/config.py
 ```
 
-The configuration should provide values equivalent to:
+The configuration provides values equivalent to:
 
 ```text
 DB_HOST
@@ -1107,7 +988,7 @@ DB_PASSWORD
 DB_NAME
 ```
 
-Example:
+Typical local configuration:
 
 ```text
 Host: localhost
@@ -1115,13 +996,13 @@ Port: 3306
 Database: restaurant_db
 ```
 
-Do **not** commit real database passwords to GitHub.
-
-For a public repository, environment variables should be preferred.
+Do **not** commit real database passwords or other sensitive credentials to GitHub.
 
 ---
 
 # Running the Application
+
+## CLI
 
 From the project root:
 
@@ -1129,90 +1010,214 @@ From the project root:
 python -m application.app
 ```
 
-The application opens the main CLI:
+## Web Application
+
+From the project root:
+
+```powershell
+python -m application.web_app
+```
+
+Then open:
 
 ```text
-==================================================
-   RESTAURANT TABLE RESERVATION & FOOD SERVICE
-==================================================
-1. Reservation Management
-2. Order Management
-3. Kitchen Management
-4. Billing & Payment
-5. Reports
-0. Exit
+http://127.0.0.1:5000/
+```
+
+The web application exposes separate pages for Dashboard, Reservations, Tables, Orders, Kitchen, Billing, and Reports.
+
+---
+
+# API Endpoints
+
+The Flask application provides APIs for the main modules, including:
+
+```text
+/api/health
+/api/dashboard
+/api/customers
+/api/tables
+
+/api/reservations
+/api/reservations/availability
+
+/api/orders
+/api/orders/<order_id>
+/api/orders/<order_id>/items
+/api/orders/<order_id>/close
+
+/api/kitchen/tickets
+/api/kitchen/tickets/queued
+/api/kitchen/tickets/<ticket_id>/preparing
+/api/kitchen/tickets/<ticket_id>/ready
+/api/kitchen/tickets/<ticket_id>/served
+
+/api/bills
+/api/bills/generate
+/api/payments
+
+/api/reports/available-tables
+/api/reports/table-turnover
+/api/reports/waiter-performance
+/api/reports/item-sales
+/api/reports/kitchen-delays
+/api/reports/discount-usage
+/api/reports/revenue
+```
+
+The exact route set is implemented in:
+
+```text
+application/web/routes.py
 ```
 
 ---
 
-# CLI Modules
+# Testing & Validation
 
-## Reservation Management
+The system was tested using both positive and negative cases.
 
-```text
-1. Check Table Availability
-2. Create Reservation
-3. View Reservations
-4. Cancel Reservation
-0. Back
-```
+## Reservation Tests
 
-## Order Management
+| Test                               | Expected Result                         | Status |
+| ---------------------------------- | --------------------------------------- | ------ |
+| Check table availability           | Suitable tables displayed               | PASS   |
+| Guest count exceeds table capacity | No suitable table / reservation blocked | PASS   |
+| Overlapping reservation            | Conflicting table excluded              | PASS   |
+| Valid reservation creation         | Reservation created successfully        | PASS   |
 
-```text
-1. Create Order
-2. Add Order Item
-3. View Order
-4. Close Order
-0. Back
-```
+## Order Tests
 
-## Kitchen Management
+| Test           | Expected Result                             | Status |
+| -------------- | ------------------------------------------- | ------ |
+| Create order   | Order and kitchen ticket created            | PASS   |
+| Add valid item | Item added with current menu price snapshot | PASS   |
+| Quantity = 0   | Rejected                                    | PASS   |
+| Quantity = -1  | Rejected                                    | PASS   |
+| Close order    | Order becomes Closed                        | PASS   |
 
-```text
-1. View Queued Tickets
-2. View Active/Preparing Tickets
-3. Mark Preparing
-4. Mark Ready
-5. Mark Served
-0. Back
-```
+## Kitchen Tests
 
-## Billing & Payment
+| Test               | Expected Result                        | Status |
+| ------------------ | -------------------------------------- | ------ |
+| Queued → Preparing | Status updated                         | PASS   |
+| Preparing → Ready  | Status updated and ready time recorded | PASS   |
+| Ready → Served     | Status updated                         | PASS   |
 
-```text
-1. Generate Bill
-2. View Bill
-3. Process Payment
-0. Back
-```
+## Billing & Payment Tests
 
-## Reports
+| Test                           | Expected Result  | Status |
+| ------------------------------ | ---------------- | ------ |
+| Bill active order              | Rejected         | PASS   |
+| Generate bill for closed order | Bill generated   | PASS   |
+| Correct tax/total calculation  | Correct values   | PASS   |
+| Exact payment                  | Payment accepted | PASS   |
+| Duplicate payment              | Rejected         | PASS   |
+| Paid bill modification         | Rejected         | PASS   |
 
-```text
-1. Available Tables
-2. Table Turnover
-3. Waiter Performance
-4. Item Sales
-5. Kitchen Delays
-6. Discount Usage
-7. Revenue
-0. Back
-```
+## Report Tests
+
+All seven report APIs were verified successfully:
+
+| Report             | Status |
+| ------------------ | ------ |
+| Available Tables   | PASS   |
+| Table Turnover     | PASS   |
+| Waiter Performance | PASS   |
+| Item Sales         | PASS   |
+| Kitchen Delays     | PASS   |
+| Discount Usage     | PASS   |
+| Revenue            | PASS   |
 
 ---
 
-# Security Considerations
+# Final Database Integrity Audit
 
-The project uses several mechanisms to improve data safety.
+After functional testing, the following database consistency checks were executed:
+
+| Audit                      | Result |
+| -------------------------- | -----: |
+| Orphan reservations        |    `0` |
+| Invalid order items        |    `0` |
+| Orphan order items         |    `0` |
+| Paid bills without payment |    `0` |
+| Unpaid bills with payment  |    `0` |
+| Bills with invalid totals  |    `0` |
+
+The audit confirms that the tested database state contains no detected orphan records, invalid order quantities, payment-status inconsistencies, or negative/invalid bill totals.
+
+---
+
+# Verified End-to-End Transaction
+
+The final web application workflow was successfully demonstrated using **Order #24**.
+
+```text
+Order ID        : 24
+Table           : T06
+Waiter          : Arjun Rao
+
+Order Item:
+Chicken Biryani × 1
+
+Unit Price      : ₹350.00
+Line Total      : ₹350.00
+
+Kitchen Ticket  : 23
+Kitchen Status  : Served
+
+Order Status    : Closed
+
+Bill ID         : 20
+Subtotal        : ₹350.00
+Tax             : ₹17.50
+Total           : ₹367.50
+
+Payment Method  : UPI
+Payment Amount  : ₹367.50
+
+Bill Status     : Paid
+```
+
+The database verification confirmed the complete relationship:
+
+```text
+Order #24
+    ↓
+Kitchen Ticket #23
+    ↓
+Served
+    ↓
+Order Closed
+    ↓
+Bill #20
+    ↓
+₹367.50
+    ↓
+Payment
+    ↓
+Paid
+```
+
+This provides an end-to-end demonstration from order creation through kitchen processing, billing, and payment.
+
+---
+
+# Security & Reliability
+
+The project uses several mechanisms to improve data safety:
 
 ### Parameterized SQL
 
-User-provided values are passed through parameters rather than string concatenation.
+User-provided values are passed through SQL parameters rather than string concatenation.
 
 ### Database Constraints
 
-Invalid data is rejected at the database level.
+Invalid values are rejected at the database level.
+
+### Foreign Keys
+
+Relationships between entities are protected by referential integrity.
 
 ### Transactions
 
@@ -1220,36 +1225,27 @@ Critical multi-step operations use transactions.
 
 ### Row Locking
 
-The reservation and payment procedures use `FOR UPDATE` where required to protect concurrent operations.
+Reservation and payment procedures use row locking where required to protect concurrent operations.
 
 ### Paid Bill Protection
 
-Paid bills cannot be modified through normal updates.
+Paid financial records cannot be modified through normal update operations.
 
 ### Configuration Security
 
-Database credentials should not be hard-coded into publicly shared source code.
+Database credentials should be kept outside publicly shared source code.
 
 ---
 
 # Error Handling
 
-The Python service layer catches MySQL errors using:
+The Python service layer handles MySQL exceptions using:
 
 ```python
 from mysql.connector import Error
 ```
 
-Errors are converted into structured responses such as:
-
-```python
-{
-    "success": False,
-    "message": "..."
-}
-```
-
-Successful operations use responses such as:
+Operations return structured responses such as:
 
 ```python
 {
@@ -1258,7 +1254,16 @@ Successful operations use responses such as:
 }
 ```
 
-This keeps the CLI layer separate from database-specific error handling.
+or:
+
+```python
+{
+    "success": False,
+    "message": "..."
+}
+```
+
+This keeps database-specific error handling inside the application/service layers rather than exposing raw database errors directly to the user interface.
 
 ---
 
@@ -1266,7 +1271,7 @@ This keeps the CLI layer separate from database-specific error handling.
 
 ## Why MySQL?
 
-MySQL is suitable because the project contains highly related entities and requires:
+MySQL is suitable because the project requires:
 
 - Foreign keys
 - Constraints
@@ -1274,6 +1279,7 @@ MySQL is suitable because the project contains highly related entities and requi
 - Stored procedures
 - Triggers
 - Relational queries
+- Aggregation and reporting
 
 ## Why a Service Layer?
 
@@ -1281,17 +1287,17 @@ The service layer separates:
 
 ```text
 User Interface
-       ↓
+      ↓
 Business Logic
-       ↓
+      ↓
 Database
 ```
 
-This makes the system easier to maintain and extend.
+This allows the CLI and web interface to reuse the same business logic.
 
 ## Why Store Historical Prices?
 
-Menu prices can change. An old order should retain the price that was applicable when it was created.
+Menu prices may change over time. An existing order must retain the price that applied when the order was created.
 
 Therefore:
 
@@ -1309,97 +1315,34 @@ represents the transaction price.
 
 ## Why Use Database Triggers?
 
-Application validation alone is insufficient because database records could potentially be modified by another application or direct SQL.
-
-Triggers provide database-level enforcement.
+Application validation alone cannot guarantee integrity if data is modified through another application or directly through SQL. Database triggers provide an additional database-level enforcement layer.
 
 ---
 
-# Scalability Considerations
+# Scalability and Future Enhancements
 
-For a larger production deployment, the following improvements could be introduced:
+Possible future improvements include:
 
-- REST API layer
-- Web/mobile frontend
 - Authentication and role-based access control
-- Connection pooling
-- Database migrations
-- Centralized logging
-- Audit logs
-- Automated testing
-- Docker deployment
-- CI/CD
-- Cloud-hosted MySQL
-- Redis caching
-- Background workers
-- Real-time kitchen notifications
-- Payment gateway integration
+- Customer portal
+- Mobile application
+- Real payment gateway integration
 - Inventory management
 - Customer notifications
-
----
-
-# Limitations
-
-The current implementation is primarily a **CLI-based academic/project system**.
-
-Potential future improvements include:
-
-- Graphical/web interface
-- User authentication
-- Role-based authorization
-- Production-grade concurrency handling across all workflows
-- Advanced inventory management
-- Real payment gateway integration
-- Automated notification systems
-- Comprehensive automated test suite
-- Production deployment configuration
-
----
-
-# Future Enhancements
-
-### Customer Portal
-
-Customers could:
-
-- Register/login
-- Browse menus
-- Reserve tables
-- View reservation status
-- Place orders
-- View bills
-
-### Restaurant Dashboard
-
-Management could monitor:
-
-- Table occupancy
-- Revenue
-- Popular dishes
-- Waiter performance
-- Kitchen delays
-- Reservation trends
-
-### Kitchen Dashboard
-
-Kitchen staff could receive real-time:
-
-```text
-Queued → Preparing → Ready → Served
-```
-
-notifications.
-
-### Analytics
-
-Future versions could include:
-
-- Peak-hour analysis
+- Real-time kitchen notifications
+- Audit logging
+- Centralized application logging
+- Automated test suite
+- Database migrations
+- Docker deployment
+- CI/CD
+- Cloud-hosted deployment
+- Connection pooling
+- Redis caching
+- Background workers
+- Advanced restaurant analytics
 - Revenue forecasting
 - Demand prediction
-- Menu popularity analysis
-- Table utilization analytics
 
 ---
 
@@ -1408,21 +1351,25 @@ Future versions could include:
 This project demonstrates practical understanding of:
 
 - Relational database design
-- Entity relationships
+- ER modeling
 - Primary and foreign keys
+- Normalization and 3NF
 - SQL constraints
-- Joins
+- Referential integrity
+- SQL joins
 - Aggregation
 - Stored procedures
 - Triggers
 - Transactions
 - Row locking
-- Python database connectivity
+- Python–MySQL connectivity
+- Flask API development
 - Service-layer architecture
 - Exception handling
 - Business-rule enforcement
 - Database testing
 - Data integrity validation
+- Operational reporting
 
 ---
 
@@ -1434,26 +1381,48 @@ A concise explanation for project demonstration:
 
 ---
 
-# Project Validation Status
+# Review 3 Validation Status
 
 ```text
-┌──────────────────────────────────────┐
-│       PROJECT VALIDATION STATUS      │
-├──────────────────────────────────────┤
-│ Reservation Management       PASS    │
-│ Order Management             PASS    │
-│ Kitchen Management           PASS    │
-│ Billing                      PASS    │
-│ Payment                      PASS    │
-│ Database Integrity           PASS    │
-│ Constraints                  PASS    │
-│ Triggers                     PASS    │
-│ Stored Procedures            PASS    │
-│ Transaction Handling         PASS    │
-│ Negative Testing             PASS    │
-│ Final Consistency Audit       PASS    │
-└──────────────────────────────────────┘
+┌────────────────────────────────────────────┐
+│       PROJECT VALIDATION STATUS            │
+├────────────────────────────────────────────┤
+│ Reservation Management             PASS    │
+│ Table Availability                 PASS    │
+│ Capacity Validation                PASS    │
+│ Overlap Protection                 PASS    │
+│ Order Management                   PASS    │
+│ Order Item Validation              PASS    │
+│ Kitchen Management                 PASS    │
+│ Kitchen State Transitions          PASS    │
+│ Billing                            PASS    │
+│ Discount Validation                PASS    │
+│ Payment Processing                 PASS    │
+│ Duplicate Payment Protection       PASS    │
+│ Reports (7/7)                      PASS    │
+│ Database Integrity (6/6)          PASS    │
+│ End-to-End Transaction             PASS    │
+└────────────────────────────────────────────┘
 ```
+
+---
+
+# Project Status
+
+**Status: Completed and Functionally Validated**
+
+The current implementation successfully demonstrates:
+
+- Complete restaurant operational workflow
+- MySQL relational database integration
+- CLI and Flask web interfaces
+- Database-level integrity mechanisms
+- Application-level business rules
+- Kitchen state management
+- Billing and payment processing
+- Operational reporting
+- Positive and negative testing
+- Final database consistency validation
 
 ---
 
@@ -1461,19 +1430,6 @@ A concise explanation for project demonstration:
 
 **Vindhya Lekhana**
 
-B.Tech Computer Science & Engineering
+B.Tech Computer Science & Engineering  
 Specialization: Blockchain, IoT & Cybersecurity
 
----
-
-# License
-
-This project was developed as an academic project. Unless a separate license is added to the repository, the source code should be treated as **academic/project work** and not assumed to be freely licensed for redistribution.
-
----
-
-## Project Status
-
-**Status: Completed and Functionally Validated**
-
-The current implementation has successfully demonstrated the core restaurant workflow, database integrity mechanisms, application-layer integration, error handling, and final database consistency checks.

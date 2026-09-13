@@ -1,0 +1,137 @@
+{% extends "base.html" %} {% block title %} Dashboard | Restaurant Management
+System {% endblock %} {% block page_title %} Dashboard {% endblock %} {% block
+page_subtitle %} Restaurant operations overview {% endblock %} {% block content
+%}
+
+<section class="welcome-section">
+  <h3>Restaurant Overview</h3>
+
+  <p>
+    Monitor reservations, orders, kitchen activity, billing and payments from
+    one place.
+  </p>
+</section>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">R</div>
+
+    <div>
+      <span class="stat-label"> Today's Reservations </span>
+
+      <strong id="reservation-count"> -- </strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">O</div>
+
+    <div>
+      <span class="stat-label"> Active Orders </span>
+
+      <strong id="order-count"> -- </strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">K</div>
+
+    <div>
+      <span class="stat-label"> Kitchen Pending </span>
+
+      <strong id="kitchen-count"> -- </strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">₹</div>
+
+    <div>
+      <span class="stat-label"> Today's Revenue </span>
+
+      <strong id="revenue"> ₹ -- </strong>
+    </div>
+  </div>
+</div>
+
+<div class="content-grid">
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h3>Restaurant Operations</h3>
+
+        <p>Quick access to major operations</p>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <a href="{{ url_for('web.reservations_page') }}" class="action-card">
+        <span>＋</span>
+
+        <strong> New Reservation </strong>
+
+        <small> Book a restaurant table </small>
+      </a>
+
+      <a href="{{ url_for('web.orders_page') }}" class="action-card">
+        <span>＋</span>
+
+        <strong> New Order </strong>
+
+        <small> Create a customer order </small>
+      </a>
+
+      <a href="{{ url_for('web.kitchen_page') }}" class="action-card">
+        <span>◉</span>
+
+        <strong> Kitchen Queue </strong>
+
+        <small> Manage kitchen tickets </small>
+      </a>
+
+      <a href="{{ url_for('web.billing_page') }}" class="action-card">
+        <span>₹</span>
+
+        <strong> Billing </strong>
+
+        <small> Manage bills and payments </small>
+      </a>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h3>System Status</h3>
+
+        <p>Application connectivity</p>
+      </div>
+    </div>
+
+    <div class="system-check">
+      <div class="check-row">
+        <span> Web Application </span>
+
+        <span class="badge success"> Online </span>
+      </div>
+
+      <div class="check-row">
+        <span> Database </span>
+
+        <span id="database-status" class="badge pending"> Checking... </span>
+      </div>
+
+      <div class="check-row">
+        <span> API </span>
+
+        <span class="badge success"> Available </span>
+      </div>
+    </div>
+  </section>
+</div>
+
+{% endblock %} {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+{% endblock %}

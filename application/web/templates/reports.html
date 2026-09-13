@@ -1,0 +1,129 @@
+{% extends "base.html" %} {% block title %} Reports | Restaurant Management
+System {% endblock %} {% block page_title %} Reports {% endblock %} {% block
+page_subtitle %} Operational reports and business insights {% endblock %} {%
+block content %}
+
+<div class="page-heading">
+  <div>
+    <h3>Reports & Analytics</h3>
+    <p>
+      View operational and financial reports generated from the restaurant
+      database.
+    </p>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h3>Select Report</h3>
+      <p>
+        Choose a report to retrieve the latest information from the database.
+      </p>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="report-select">Report</label>
+
+      <select id="report-select">
+        <option value="available-tables">Available Tables</option>
+
+        <option value="table-turnover">Table Turnover</option>
+
+        <option value="waiter-performance">Waiter Performance</option>
+
+        <option value="item-sales">Item Sales</option>
+
+        <option value="kitchen-delays">Kitchen Delays</option>
+
+        <option value="discount-usage">Discount Usage</option>
+
+        <option value="revenue">Revenue</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>&nbsp;</label>
+
+      <button type="button" id="run-report-button" class="primary-button">
+        Run Report
+      </button>
+    </div>
+  </div>
+
+  <div id="report-message" class="form-message"></div>
+</section>
+
+<section class="stats-grid" id="report-summary">
+  <div class="stat-card">
+    <div class="stat-icon">R</div>
+
+    <div>
+      <span class="stat-label">Report</span>
+      <strong id="summary-report">-</strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">N</div>
+
+    <div>
+      <span class="stat-label">Records</span>
+      <strong id="summary-records">0</strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">T</div>
+
+    <div>
+      <span class="stat-label">Last Updated</span>
+      <strong id="summary-updated">-</strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">D</div>
+
+    <div>
+      <span class="stat-label">Database</span>
+      <strong>MySQL</strong>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h3 id="report-title">Available Tables</h3>
+
+      <p id="report-description">Tables currently available for seating.</p>
+    </div>
+
+    <button type="button" id="refresh-report-button" class="secondary-button">
+      Refresh
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead id="report-table-head">
+        <tr>
+          <th>Loading</th>
+        </tr>
+      </thead>
+
+      <tbody id="report-table-body">
+        <tr>
+          <td class="table-loading">Select a report to view data.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+{% endblock %}

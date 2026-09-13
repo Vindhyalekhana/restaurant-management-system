@@ -1,0 +1,364 @@
+{% extends "base.html" %} {% block title %}Kitchen | Restaurant Management
+System{% endblock %} {% block page_title %}Kitchen{% endblock %} {% block
+page_subtitle %} Kitchen ticket processing and order preparation {% endblock %}
+{% block content %}
+
+<div class="page-heading">
+  <div>
+    <h3>Kitchen Management</h3>
+    <p>
+      Monitor active kitchen tickets and process orders through the required
+      preparation stages.
+    </p>
+  </div>
+</div>
+
+<section class="stats-grid kitchen-stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">K</div>
+    <div>
+      <span class="stat-label">Total Active</span>
+      <strong id="total-active-count">0</strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">Q</div>
+    <div>
+      <span class="stat-label">Queued</span>
+      <strong id="queued-count">0</strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">P</div>
+    <div>
+      <span class="stat-label">Preparing</span>
+      <strong id="preparing-count">0</strong>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">R</div>
+    <div>
+      <span class="stat-label">Ready</span>
+      <strong id="ready-count">0</strong>
+    </div>
+  </div>
+</section>
+
+<section class="panel kitchen-filter-panel">
+  <div class="kitchen-filter-row">
+    <div class="kitchen-search-group">
+      <label for="kitchen-search">Search Tickets</label>
+
+      <input
+        type="text"
+        id="kitchen-search"
+        placeholder="Search by ticket ID or order ID"
+      />
+    </div>
+
+    <div class="kitchen-status-group">
+      <label for="kitchen-status-filter">Status</label>
+
+      <select id="kitchen-status-filter">
+        <option value="All">All Statuses</option>
+        <option value="Queued">Queued</option>
+        <option value="Preparing">Preparing</option>
+        <option value="Ready">Ready</option>
+      </select>
+    </div>
+
+    <div class="kitchen-refresh-group">
+      <button type="button" id="refresh-kitchen" class="secondary-button">
+        Refresh
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="panel kitchen-tickets-panel">
+  <div class="panel-header">
+    <div>
+      <h3>Kitchen Tickets</h3>
+      <p>Current orders moving through the kitchen workflow.</p>
+    </div>
+
+    <span id="kitchen-ticket-count" class="kitchen-ticket-count">
+      0 tickets
+    </span>
+  </div>
+
+  <div id="kitchen-message" class="form-message"></div>
+
+  <div id="kitchen-tickets-grid" class="kitchen-tickets-grid">
+    <div class="kitchen-empty-state">
+      <span>K</span>
+      <h4>Loading kitchen tickets...</h4>
+      <p>Active kitchen tickets will appear here.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/kitchen.js') }}"></script>
+
+<style>
+  /* Kitchen page layout */
+
+  .kitchen-stats-grid {
+    margin-bottom: 20px;
+  }
+
+  .kitchen-filter-panel {
+    margin-bottom: 20px;
+  }
+
+  .kitchen-filter-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px auto;
+    gap: 16px;
+    align-items: end;
+  }
+
+  .kitchen-search-group,
+  .kitchen-status-group,
+  .kitchen-refresh-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kitchen-search-group label,
+  .kitchen-status-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #454a51;
+    margin-bottom: 7px;
+  }
+
+  .kitchen-search-group input,
+  .kitchen-status-group select {
+    width: 100%;
+    border: 1px solid #dfe2e6;
+    background: #ffffff;
+    border-radius: 7px;
+    padding: 10px 11px;
+    font-size: 13px;
+    color: #20242a;
+    outline: none;
+  }
+
+  .kitchen-search-group input:focus,
+  .kitchen-status-group select:focus {
+    border-color: #8d939b;
+  }
+
+  .kitchen-refresh-group .secondary-button {
+    min-width: 100px;
+    height: 37px;
+  }
+
+  .kitchen-tickets-panel {
+    margin-bottom: 20px;
+  }
+
+  .kitchen-ticket-count {
+    color: #777d85;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* Ticket cards */
+
+  .kitchen-tickets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .kitchen-ticket-card {
+    border: 1px solid #e0e3e7;
+    background: #ffffff;
+    border-radius: 9px;
+    padding: 17px;
+    transition: 0.15s ease;
+  }
+
+  .kitchen-ticket-card:hover {
+    border-color: #b8bdc4;
+    transform: translateY(-1px);
+  }
+
+  .kitchen-ticket-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .kitchen-ticket-label {
+    color: #858a91;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+
+  .kitchen-ticket-id {
+    font-size: 18px;
+    font-weight: 700;
+    color: #20242a;
+  }
+
+  .kitchen-order-id {
+    margin-top: 3px;
+    font-size: 11px;
+    color: #777d85;
+  }
+
+  .kitchen-status-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .kitchen-status-badge.queued {
+    background: #f7f0df;
+    color: #86691e;
+  }
+
+  .kitchen-status-badge.preparing {
+    background: #eef0f2;
+    color: #60666e;
+  }
+
+  .kitchen-status-badge.ready {
+    background: #e7f6ed;
+    color: #28734a;
+  }
+
+  .kitchen-ticket-divider {
+    height: 1px;
+    background: #eeeeef;
+    margin-bottom: 14px;
+  }
+
+  .kitchen-ticket-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .kitchen-detail-label {
+    display: block;
+    color: #858a91;
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+
+  .kitchen-detail-value {
+    display: block;
+    color: #30343a;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .kitchen-action-button {
+    width: 100%;
+    border: none;
+    border-radius: 7px;
+    background: #17191d;
+    color: #ffffff;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .kitchen-action-button:hover {
+    background: #292c31;
+  }
+
+  .kitchen-action-button:disabled {
+    background: #c7cbd0;
+    cursor: not-allowed;
+  }
+
+  .kitchen-empty-state {
+    grid-column: 1 / -1;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid #e3e5e8;
+    border-radius: 9px;
+    background: #ffffff;
+  }
+
+  .kitchen-empty-state > span {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #f1f2f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .kitchen-empty-state h4 {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .kitchen-empty-state p {
+    color: #777d85;
+    font-size: 12px;
+    max-width: 280px;
+  }
+
+  @media (max-width: 1100px) {
+    .kitchen-tickets-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .kitchen-filter-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .kitchen-refresh-group {
+      grid-column: 1 / -1;
+    }
+
+    .kitchen-refresh-group .secondary-button {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .kitchen-tickets-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .kitchen-filter-row {
+      grid-template-columns: 1fr;
+    }
+
+    .kitchen-refresh-group {
+      grid-column: auto;
+    }
+  }
+</style>
+
+{% endblock %}

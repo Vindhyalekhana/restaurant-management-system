@@ -1,0 +1,102 @@
+{% extends "base.html" %} {% block title %} Tables | Restaurant Management
+System {% endblock %} {% block page_title %} Tables {% endblock %} {% block
+page_subtitle %} Restaurant table layout and availability {% endblock %} {%
+block content %}
+
+<div class="page-heading">
+  <div>
+    <h3>Table Management</h3>
+    <p>
+      View restaurant tables, seating capacity, dining areas, and current
+      status.
+    </p>
+  </div>
+</div>
+
+<!-- Table summary -->
+<section class="table-summary-grid">
+  <div class="table-summary-card">
+    <div>
+      <span class="summary-label">Total Tables</span>
+      <strong id="total-tables">0</strong>
+    </div>
+  </div>
+
+  <div class="table-summary-card">
+    <div>
+      <span class="summary-label">Available</span>
+      <strong id="available-tables">0</strong>
+    </div>
+  </div>
+
+  <div class="table-summary-card">
+    <div>
+      <span class="summary-label">Occupied</span>
+      <strong id="occupied-tables">0</strong>
+    </div>
+  </div>
+
+  <div class="table-summary-card">
+    <div>
+      <span class="summary-label">Reserved</span>
+      <strong id="reserved-tables">0</strong>
+    </div>
+  </div>
+</section>
+
+<!-- Search and filter -->
+<section class="panel table-controls-panel">
+  <div class="table-controls">
+    <div class="table-search-group">
+      <label for="table-search"> Search Tables </label>
+
+      <input
+        type="search"
+        id="table-search"
+        placeholder="Search by table number or dining area"
+      />
+    </div>
+
+    <div class="table-filter-group">
+      <label for="status-filter"> Status </label>
+
+      <select id="status-filter">
+        <option value="All">All Statuses</option>
+        <option value="Available">Available</option>
+        <option value="Occupied">Occupied</option>
+        <option value="Reserved">Reserved</option>
+        <option value="Maintenance">Maintenance</option>
+      </select>
+    </div>
+
+    <div class="table-refresh-group">
+      <button type="button" id="refresh-tables" class="secondary-button">
+        Refresh
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Restaurant tables -->
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h3>Restaurant Tables</h3>
+      <p>Current table configuration and operational status</p>
+    </div>
+  </div>
+
+  <div id="tables-container" class="restaurant-tables-grid">
+    <div class="table-page-message">
+      <span>...</span>
+      <h4>Loading tables</h4>
+      <p>Retrieving restaurant table information.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/tables.js') }}"></script>
+
+{% endblock %}

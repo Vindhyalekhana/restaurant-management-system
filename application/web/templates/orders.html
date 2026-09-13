@@ -1,0 +1,175 @@
+{% extends "base.html" %} {% block title %}Orders | Restaurant Management
+System{% endblock %} {% block page_title %}Orders{% endblock %} {% block
+page_subtitle %} Order entry, item management and order tracking {% endblock %}
+{% block content %}
+
+<div class="page-heading">
+  <div>
+    <h3>Order Management</h3>
+    <p>Create restaurant orders, add menu items and monitor order status.</p>
+  </div>
+</div>
+
+<!-- Order creation and item entry -->
+<div class="reservation-grid">
+  <!-- Create Order -->
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h3>Create Order</h3>
+        <p>Assign a table, waiter and optional reservation.</p>
+      </div>
+    </div>
+
+    <form id="order-form">
+      <div class="form-group">
+        <label for="table-select"> Table </label>
+
+        <select id="table-select" required>
+          <option value="">Select table</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="waiter-select"> Waiter </label>
+
+        <select id="waiter-select" required>
+          <option value="">Select waiter</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="reservation-select">
+          Reservation
+          <span class="optional-label">(Optional)</span>
+        </label>
+
+        <select id="reservation-select">
+          <option value="">Walk-in order</option>
+        </select>
+      </div>
+
+      <div id="order-form-message" class="form-message"></div>
+
+      <button type="submit" id="create-order-button" class="primary-button">
+        Create Order
+      </button>
+    </form>
+  </section>
+
+  <!-- Add Order Item -->
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h3>Add Order Item</h3>
+        <p>Add food and beverages to the selected order.</p>
+      </div>
+    </div>
+
+    <form id="order-item-form">
+      <div class="form-group">
+        <label for="order-item-select"> Menu Item </label>
+
+        <select id="order-item-select" required>
+          <option value="">Select menu item</option>
+        </select>
+
+        <small id="menu-item-price" class="form-help">
+          Select an available menu item.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="item-quantity"> Quantity </label>
+
+        <input type="number" id="item-quantity" min="1" value="1" required />
+      </div>
+
+      <div class="form-group">
+        <label for="special-instructions"> Special Instructions </label>
+
+        <textarea
+          id="special-instructions"
+          rows="3"
+          placeholder="Optional instructions"
+        ></textarea>
+      </div>
+
+      <div id="item-form-message" class="form-message"></div>
+
+      <button
+        type="submit"
+        id="add-item-button"
+        class="primary-button"
+        disabled
+      >
+        Add Item
+      </button>
+    </form>
+  </section>
+</div>
+
+<!-- Selected Order -->
+<section class="panel selected-order-panel" id="selected-order-panel">
+  <div class="panel-header">
+    <div>
+      <h3>Selected Order</h3>
+
+      <p>View the selected order, ordered items and calculated total.</p>
+    </div>
+  </div>
+
+  <div id="order-details">
+    <div class="empty-state">
+      <span>▤</span>
+
+      <h4>No order selected</h4>
+
+      <p>Select an order from the list below to view its details.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Orders List -->
+<section class="panel orders-list-panel">
+  <div class="panel-header">
+    <div>
+      <h3>Orders</h3>
+
+      <p>Existing restaurant orders and their current status.</p>
+    </div>
+
+    <button type="button" id="refresh-orders" class="secondary-button">
+      Refresh
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Table</th>
+          <th>Waiter</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody id="orders-table-body">
+        <tr>
+          <td colspan="8" class="table-loading">Loading orders...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/orders.js') }}"></script>
+
+{% endblock %}

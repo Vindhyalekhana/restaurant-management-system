@@ -1,0 +1,151 @@
+{% extends "base.html" %} {% block title %} Reservations | Restaurant Management
+System {% endblock %} {% block page_title %} Reservations {% endblock %} {%
+block page_subtitle %} Table booking and reservation management {% endblock %}
+{% block content %}
+
+<div class="page-heading">
+  <div>
+    <h3>Reservation Management</h3>
+    <p>Search table availability and manage customer reservations.</p>
+  </div>
+</div>
+
+<div class="reservation-grid">
+  <!-- Create Reservation -->
+  <section class="panel reservation-form-panel">
+    <div class="panel-header reservation-panel-header">
+      <div>
+        <h3>Create Reservation</h3>
+        <p>Enter reservation details and check table availability.</p>
+      </div>
+    </div>
+
+    <div class="reservation-form-body">
+      <form id="reservation-form">
+        <div class="form-group">
+          <label for="customer-select"> Customer </label>
+
+          <select id="customer-select" required>
+            <option value="">Loading customers...</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reservation-date"> Reservation Date </label>
+
+            <input type="date" id="reservation-date" required />
+          </div>
+
+          <div class="form-group">
+            <label for="guest-count"> Guests </label>
+
+            <input type="number" id="guest-count" min="1" value="2" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="start-time"> Start Time </label>
+
+            <input type="time" id="start-time" required />
+          </div>
+
+          <div class="form-group">
+            <label for="end-time"> End Time </label>
+
+            <input type="time" id="end-time" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="special-requests"> Special Requests </label>
+
+          <textarea
+            id="special-requests"
+            rows="3"
+            placeholder="Optional"
+          ></textarea>
+        </div>
+
+        <button type="button" id="availability-button" class="primary-button">
+          Check Availability
+        </button>
+
+        <div
+          id="availability-message"
+          class="form-message"
+          aria-live="polite"
+        ></div>
+
+        <button
+          type="submit"
+          id="create-reservation-button"
+          class="primary-button"
+          disabled
+        >
+          Create Reservation
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Available Tables -->
+  <section class="panel available-tables-panel">
+    <div class="panel-header reservation-panel-header">
+      <div>
+        <h3>Available Tables</h3>
+        <p>Select a table after checking availability.</p>
+      </div>
+    </div>
+
+    <div id="table-selection" class="table-selection-empty">
+      <span>▤</span>
+
+      <p>Check availability to see suitable tables.</p>
+    </div>
+  </section>
+</div>
+
+<!-- Existing Reservations -->
+<section class="panel reservations-list-panel">
+  <div class="panel-header">
+    <div>
+      <h3>Reservations</h3>
+      <p>Existing customer reservations</p>
+    </div>
+
+    <button type="button" id="refresh-reservations" class="secondary-button">
+      Refresh
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer</th>
+          <th>Table</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Guests</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="reservations-table-body">
+        <tr>
+          <td colspan="8" class="table-loading">Loading reservations...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/reservations.js') }}"></script>
+
+{% endblock %}

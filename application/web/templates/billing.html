@@ -1,0 +1,247 @@
+{% extends "base.html" %} {% block title %} Billing | Restaurant Management
+System {% endblock %} {% block page_title %} Billing {% endblock %} {% block
+page_subtitle %} Bill generation, discount control and payment management {%
+endblock %} {% block content %}
+
+<div class="page-heading">
+  <div>
+    <h3>Billing Management</h3>
+    <p>Generate bills, authorize discounts and process customer payments.</p>
+  </div>
+</div>
+
+<!-- Billing summary cards -->
+<section class="stats-grid billing-stats-grid">
+  <div class="stat-card">
+    <div>
+      <span class="stat-label">Billable Orders</span>
+      <strong id="billable-orders-count">0</strong>
+      <small>Closed orders without bills</small>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div>
+      <span class="stat-label">Unpaid Bills</span>
+      <strong id="unpaid-bills-count">0</strong>
+      <small>Awaiting payment</small>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div>
+      <span class="stat-label">Paid Bills</span>
+      <strong id="paid-bills-count">0</strong>
+      <small>Completed payments</small>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div>
+      <span class="stat-label">Paid Revenue</span>
+      <strong id="paid-revenue">₹0.00</strong>
+      <small>Realized revenue</small>
+    </div>
+  </div>
+</section>
+
+<!-- Billing forms -->
+<section class="billing-forms-grid">
+  <!-- Generate Bill -->
+  <section class="panel billing-panel">
+    <div class="panel-header">
+      <div>
+        <h3>Generate Bill</h3>
+        <p>Select a closed order that has not yet been billed.</p>
+      </div>
+    </div>
+
+    <form id="billing-form">
+      <div class="form-group">
+        <label for="billable-order-select"> Closed Order </label>
+
+        <select id="billable-order-select" required>
+          <option value="">Select closed order</option>
+        </select>
+      </div>
+
+      <div id="selected-order-billing-summary" class="billing-selection-empty">
+        <span>▤</span>
+
+        <p>Select an order to view its billing information.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="discount-select"> Discount </label>
+
+        <select id="discount-select">
+          <option value="">No discount</option>
+        </select>
+
+        <small class="field-help">
+          Discounts require authorization by an active waiter.
+        </small>
+      </div>
+
+      <div id="discount-authorization" class="discount-authorization hidden">
+        <div class="form-group">
+          <label for="authorizing-waiter-select"> Authorizing Waiter </label>
+
+          <select id="authorizing-waiter-select">
+            <option value="">Select active waiter</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="billing-form-message" class="form-message"></div>
+
+      <button
+        type="submit"
+        id="generate-bill-button"
+        class="primary-button"
+        disabled
+      >
+        Generate Bill
+      </button>
+    </form>
+  </section>
+
+  <!-- Payment -->
+  <section class="panel billing-panel">
+    <div class="panel-header">
+      <div>
+        <h3>Payment</h3>
+        <p>Process payment for an unpaid bill.</p>
+      </div>
+    </div>
+
+    <form id="payment-form">
+      <div class="form-group">
+        <label for="unpaid-bill-select"> Unpaid Bill </label>
+
+        <select id="unpaid-bill-select" required>
+          <option value="">Select unpaid bill</option>
+        </select>
+      </div>
+
+      <div id="selected-payment-summary" class="billing-selection-empty">
+        <span>▤</span>
+
+        <p>Select a bill to view its details.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="payment-method"> Payment Method </label>
+
+        <select id="payment-method" required>
+          <option value="">Select payment method</option>
+
+          <option value="Cash">Cash</option>
+
+          <option value="Card">Card</option>
+
+          <option value="UPI">UPI</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="amount-paid"> Amount Paid </label>
+
+        <input
+          type="number"
+          id="amount-paid"
+          min="0"
+          step="0.01"
+          placeholder="Enter exact amount"
+          required
+        />
+
+        <small class="field-help">
+          Payment must exactly match the bill total.
+        </small>
+      </div>
+
+      <div id="payment-form-message" class="form-message"></div>
+
+      <button
+        type="submit"
+        id="process-payment-button"
+        class="primary-button"
+        disabled
+      >
+        Process Payment
+      </button>
+    </form>
+  </section>
+</section>
+
+<!-- Bill Details -->
+<section class="panel bill-details-panel">
+  <div class="panel-header">
+    <div>
+      <h3>Bill Details</h3>
+      <p>Complete bill information and payment status.</p>
+    </div>
+
+    <button type="button" id="clear-bill-details" class="secondary-button">
+      Clear
+    </button>
+  </div>
+
+  <div id="bill-details" class="bill-details-content">
+    <div class="billing-selection-empty bill-details-empty">
+      <span>▤</span>
+
+      <h4>Select a bill</h4>
+
+      <p>
+        Select a bill from the history below to view detailed billing
+        information.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Bill History -->
+<section class="panel bills-history-panel">
+  <div class="panel-header">
+    <div>
+      <h3>Bill History</h3>
+      <p>All generated bills and their current payment status.</p>
+    </div>
+
+    <button type="button" id="refresh-bills" class="secondary-button">
+      Refresh
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Bill ID</th>
+          <th>Order ID</th>
+          <th>Generated</th>
+          <th>Subtotal</th>
+          <th>Discount</th>
+          <th>Tax</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="bills-table-body">
+        <tr>
+          <td colspan="9" class="table-loading">Loading bills...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/billing.js') }}"></script>
+
+{% endblock %}

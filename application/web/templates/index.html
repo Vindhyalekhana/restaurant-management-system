@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Restaurant Management System</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-icon">R</div>
+
+          <div>
+            <h1>Restaurant</h1>
+            <span>Management System</span>
+          </div>
+        </div>
+
+        <nav class="navigation">
+          <button class="nav-item active">
+            <span>⌂</span>
+            Dashboard
+          </button>
+
+          <button class="nav-item">
+            <span>▣</span>
+            Reservations
+          </button>
+
+          <button class="nav-item">
+            <span>▤</span>
+            Tables
+          </button>
+
+          <button class="nav-item">
+            <span>◫</span>
+            Orders
+          </button>
+
+          <button class="nav-item">
+            <span>◉</span>
+            Kitchen
+          </button>
+
+          <button class="nav-item">
+            <span>₹</span>
+            Billing
+          </button>
+
+          <button class="nav-item">
+            <span>▥</span>
+            Reports
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <span class="status-dot"></span>
+          System Connected
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <h2>Dashboard</h2>
+            <p>Restaurant operations overview</p>
+          </div>
+
+          <div class="topbar-actions">
+            <div class="system-status">
+              <span class="status-dot"></span>
+              Database Online
+            </div>
+          </div>
+        </header>
+
+        <section class="dashboard">
+          <div class="welcome-section">
+            <div>
+              <h3>Restaurant Overview</h3>
+
+              <p>
+                Monitor reservations, orders, kitchen activity, billing and
+                payments from one place.
+              </p>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">R</div>
+
+              <div>
+                <span class="stat-label"> Today's Reservations </span>
+
+                <strong id="reservation-count"> -- </strong>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">O</div>
+
+              <div>
+                <span class="stat-label"> Active Orders </span>
+
+                <strong id="order-count"> -- </strong>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">K</div>
+
+              <div>
+                <span class="stat-label"> Kitchen Pending </span>
+
+                <strong id="kitchen-count"> -- </strong>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">₹</div>
+
+              <div>
+                <span class="stat-label"> Today's Revenue </span>
+
+                <strong id="revenue"> ₹ -- </strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Restaurant Operations</h3>
+                  <p>Quick access to major operations</p>
+                </div>
+              </div>
+
+              <div class="quick-actions">
+                <button class="action-card">
+                  <span>＋</span>
+                  <strong>New Reservation</strong>
+                  <small>Book a restaurant table</small>
+                </button>
+
+                <button class="action-card">
+                  <span>＋</span>
+                  <strong>New Order</strong>
+                  <small>Create a customer order</small>
+                </button>
+
+                <button class="action-card">
+                  <span>◉</span>
+                  <strong>Kitchen Queue</strong>
+                  <small>Manage kitchen tickets</small>
+                </button>
+
+                <button class="action-card">
+                  <span>₹</span>
+                  <strong>Billing</strong>
+                  <small>Manage bills and payments</small>
+                </button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3>System Status</h3>
+                  <p>Application connectivity</p>
+                </div>
+              </div>
+
+              <div class="system-check">
+                <div class="check-row">
+                  <span>Web Application</span>
+                  <span class="badge success"> Online </span>
+                </div>
+
+                <div class="check-row">
+                  <span>Database</span>
+
+                  <span id="database-status" class="badge pending">
+                    Checking...
+                  </span>
+                </div>
+
+                <div class="check-row">
+                  <span>API</span>
+
+                  <span class="badge success"> Available </span>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Restaurant Management System</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-icon">R</div>
+
+          <div>
+            <h1>Restaurant</h1>
+            <span>Management System</span>
+          </div>
+        </div>
+
+        <nav class="navigation">
+          <button class="nav-item active" data-page="dashboard">
+            <span>⌂</span>
+            Dashboard
+          </button>
+
+          <button class="nav-item" data-page="reservations">
+            <span>▣</span>
+            Reservations
+          </button>
+
+          <button class="nav-item" data-page="tables">
+            <span>▤</span>
+            Tables
+          </button>
+
+          <button class="nav-item" data-page="orders">
+            <span>◫</span>
+            Orders
+          </button>
+
+          <button class="nav-item" data-page="kitchen">
+            <span>◉</span>
+            Kitchen
+          </button>
+
+          <button class="nav-item" data-page="billing">
+            <span>₹</span>
+            Billing
+          </button>
+
+          <button class="nav-item" data-page="reports">
+            <span>▥</span>
+            Reports
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <span class="status-dot"></span>
+          System Connected
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <h2 id="page-title">Dashboard</h2>
+            <p id="page-subtitle">Restaurant operations overview</p>
+          </div>
+
+          <div class="topbar-actions">
+            <div class="system-status">
+              <span class="status-dot"></span>
+              Database
+              <strong id="header-database-status"> Connected </strong>
+            </div>
+          </div>
+        </header>
+
+        <div class="page-container">
+          <!-- Dashboard -->
+
+          <section id="dashboard-page" class="page active-page">
+            <div class="welcome-section">
+              <h3>Restaurant Overview</h3>
+
+              <p>
+                Monitor reservations, orders, kitchen activity, billing and
+                payments from one place.
+              </p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon">R</div>
+
+                <div>
+                  <span class="stat-label"> Today's Reservations </span>
+
+                  <strong id="reservation-count"> -- </strong>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon">O</div>
+
+                <div>
+                  <span class="stat-label"> Active Orders </span>
+
+                  <strong id="order-count"> -- </strong>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon">K</div>
+
+                <div>
+                  <span class="stat-label"> Kitchen Pending </span>
+
+                  <strong id="kitchen-count"> -- </strong>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon">₹</div>
+
+                <div>
+                  <span class="stat-label"> Today's Revenue </span>
+
+                  <strong id="revenue"> ₹ -- </strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-grid">
+              <section class="panel">
+                <div class="panel-header">
+                  <div>
+                    <h3>Restaurant Operations</h3>
+                    <p>Quick access to major operations</p>
+                  </div>
+                </div>
+
+                <div class="quick-actions">
+                  <button class="action-card" data-open-page="reservations">
+                    <span>＋</span>
+                    <strong>New Reservation</strong>
+                    <small> Book a restaurant table </small>
+                  </button>
+
+                  <button class="action-card" data-open-page="orders">
+                    <span>＋</span>
+                    <strong>New Order</strong>
+                    <small> Create a customer order </small>
+                  </button>
+
+                  <button class="action-card" data-open-page="kitchen">
+                    <span>◉</span>
+                    <strong>Kitchen Queue</strong>
+                    <small> Manage kitchen tickets </small>
+                  </button>
+
+                  <button class="action-card" data-open-page="billing">
+                    <span>₹</span>
+                    <strong>Billing</strong>
+                    <small> Manage bills and payments </small>
+                  </button>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-header">
+                  <div>
+                    <h3>System Status</h3>
+                    <p>Application connectivity</p>
+                  </div>
+                </div>
+
+                <div class="system-check">
+                  <div class="check-row">
+                    <span>Web Application</span>
+
+                    <span class="badge success"> Online </span>
+                  </div>
+
+                  <div class="check-row">
+                    <span>Database</span>
+
+                    <span id="database-status" class="badge pending">
+                      Checking...
+                    </span>
+                  </div>
+
+                  <div class="check-row">
+                    <span>API</span>
+
+                    <span class="badge success"> Available </span>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <!-- Reservations -->
+
+          <section id="reservations-page" class="page">
+            <div class="page-heading">
+              <div>
+                <h3>Reservation Management</h3>
+
+                <p>
+                  Search table availability and manage customer reservations.
+                </p>
+              </div>
+            </div>
+
+            <div class="reservation-grid">
+              <section class="panel">
+                <div class="panel-header">
+                  <h3>Create Reservation</h3>
+
+                  <p>Enter reservation details and check table availability.</p>
+                </div>
+
+                <form id="reservation-form">
+                  <div class="form-group">
+                    <label for="customer-select"> Customer </label>
+
+                    <select id="customer-select" required>
+                      <option value="">Select customer</option>
+                    </select>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="reservation-date"> Reservation Date </label>
+
+                      <input type="date" id="reservation-date" required />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="guest-count"> Guests </label>
+
+                      <input
+                        type="number"
+                        id="guest-count"
+                        min="1"
+                        value="2"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="start-time"> Start Time </label>
+
+                      <input type="time" id="start-time" required />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="end-time"> End Time </label>
+
+                      <input type="time" id="end-time" required />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="special-requests"> Special Requests </label>
+
+                    <textarea
+                      id="special-requests"
+                      rows="3"
+                      placeholder="Optional"
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="button"
+                    id="availability-button"
+                    class="primary-button"
+                  >
+                    Check Availability
+                  </button>
+
+                  <div id="availability-message" class="form-message"></div>
+
+                  <div id="available-tables" class="available-tables"></div>
+
+                  <button
+                    type="submit"
+                    id="create-reservation-button"
+                    class="primary-button"
+                    disabled
+                  >
+                    Create Reservation
+                  </button>
+                </form>
+              </section>
+
+              <section class="panel">
+                <div class="panel-header">
+                  <div>
+                    <h3>Available Tables</h3>
+
+                    <p>Select a table after checking availability.</p>
+                  </div>
+                </div>
+
+                <div id="table-selection" class="table-selection-empty">
+                  <span>▤</span>
+
+                  <p>Check availability to see suitable tables.</p>
+                </div>
+              </section>
+            </div>
+
+            <section class="panel reservations-list-panel">
+              <div class="panel-header">
+                <div>
+                  <h3>Reservations</h3>
+
+                  <p>Existing customer reservations</p>
+                </div>
+
+                <button id="refresh-reservations" class="secondary-button">
+                  Refresh
+                </button>
+              </div>
+
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Customer</th>
+                      <th>Table</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Guests</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="reservations-table-body">
+                    <tr>
+                      <td colspan="8" class="table-loading">
+                        Loading reservations...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+
+          <!-- Placeholder pages -->
+
+          <section id="tables-page" class="page placeholder-page">
+            <div class="placeholder-content">
+              <span>▤</span>
+              <h3>Tables</h3>
+              <p>Table management will be implemented next.</p>
+            </div>
+          </section>
+
+          <section id="orders-page" class="page placeholder-page">
+            <div class="placeholder-content">
+              <span>◫</span>
+              <h3>Orders</h3>
+              <p>Order management will be implemented next.</p>
+            </div>
+          </section>
+
+          <section id="kitchen-page" class="page placeholder-page">
+            <div class="placeholder-content">
+              <span>◉</span>
+              <h3>Kitchen</h3>
+              <p>Kitchen management will be implemented next.</p>
+            </div>
+          </section>
+
+          <section id="billing-page" class="page placeholder-page">
+            <div class="placeholder-content">
+              <span>₹</span>
+              <h3>Billing</h3>
+              <p>Billing and payment management will be implemented next.</p>
+            </div>
+          </section>
+
+          <section id="reports-page" class="page placeholder-page">
+            <div class="placeholder-content">
+              <span>▥</span>
+              <h3>Reports</h3>
+              <p>Restaurant reports will be implemented next.</p>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>

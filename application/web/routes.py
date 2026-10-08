@@ -587,6 +587,54 @@ def cancel_reservation(
         }, 500)
 
 
+@web_bp.route(
+    "/api/reservations/<int:reservation_id>/status",
+    methods=["PUT"]
+)
+def update_reservation_status(reservation_id):
+
+    if reservation_id <= 0:
+        return safe_jsonify({
+            "success": False,
+            "message": "Invalid reservation ID."
+        }, 400)
+
+    data = request.get_json(
+        silent=True
+    ) or {}
+
+    new_status = data.get("status")
+
+    if not new_status:
+        return safe_jsonify({
+            "success": False,
+            "message": "Reservation status is required."
+        }, 400)
+
+    try:
+        result = ReservationService.update_status(
+            reservation_id,
+            new_status
+        )
+
+        if result.get("success"):
+            return safe_jsonify(result)
+
+        return safe_jsonify(
+            result,
+            400
+        )
+
+    except Exception as e:
+        return safe_jsonify({
+            "success": False,
+            "message": (
+                "Reservation status update failed: "
+                f"{str(e)}"
+            )
+        }, 500)
+
+
 # --------------------------------------------------
 # Order support APIs
 # --------------------------------------------------

@@ -4,6 +4,13 @@ from mysql.connector import Error
 
 class ReservationService:
 
+    VALID_STATUS_TRANSITIONS = {
+        "Pending": {"Confirmed", "Cancelled"},
+        "Confirmed": {"Seated", "Cancelled"},
+        "Seated": set(),
+        "Cancelled": set()
+    }
+
     @staticmethod
     def check_availability(reservation_date, 
     start_time, end_time, guest_count):
@@ -168,10 +175,23 @@ class ReservationService:
             }
 
     @staticmethod
-    def cancel_reservation(reservation_id):
+    def update_status(reservation_id, new_status):
         """
-        Cancels a reservation after validating its current state.
+        Updates reservation status using controlled state transitions.
         """
+
+        allowed_statuses = {
+            "Pending",
+            "Confirmed",
+            "Seated",
+            "Cancelled"
+        }
+
+        if new_status not in allowed_statuses:
+            return {
+                "success": False,
+                "message": "Invalid reservation status."
+            }
 
         try:
             check_query = """
@@ -180,51 +200,72 @@ class ReservationService:
                 WHERE reservation_id = %s
             """
 
-            res = execute_query(
+            result = execute_query(
                 check_query,
                 (reservation_id,),
                 fetch=True
             )
 
-            if not res:
+            if not result:
                 return {
                     "success": False,
                     "message": "Reservation not found."
                 }
 
-            current_status = res[0]["status"]
+            current_status = result[0]["status"]
 
-            if current_status == "Cancelled":
+            allowed_transitions = (
+                ReservationService.VALID_STATUS_TRANSITIONS
+                .get(current_status, set())
+            )
+
+            if new_status not in allowed_transitions:
                 return {
                     "success": False,
-                    "message": "Reservation is already cancelled."
-                }
-
-            if current_status == "Seated":
-                return {
-                    "success": False,
-                    "message": "Cannot cancel a reservation that is already seated."
+                    "message": (
+                        f"Cannot change reservation from "
+                        f"{current_status} to {new_status}."
+                    )
                 }
 
             update_query = """
                 UPDATE RESERVATION
-                SET status = 'Cancelled'
+                SET status = %s
                 WHERE reservation_id = %s
             """
 
             execute_query(
                 update_query,
-                (reservation_id,),
+                (
+                    new_status,
+                    reservation_id
+                ),
                 fetch=False
             )
 
             return {
                 "success": True,
-                "message": "Reservation successfully cancelled."
+                "message": (
+                    f"Reservation status updated to {new_status}."
+                )
             }
 
         except Error as e:
             return {
                 "success": False,
-                "message": f"Cancellation failed: {e.msg}"
+                "message": (
+                    f"Status update failed: {e.msg}"
+                )
             }
+
+    @staticmethod
+    def cancel_reservation(reservation_id):
+        """
+        Cancels a reservation using the controlled
+        reservation status transition.
+        """
+
+        return ReservationService.update_status(
+            reservation_id,
+            "Cancelled"
+        )

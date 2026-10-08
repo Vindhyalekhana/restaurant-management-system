@@ -429,6 +429,46 @@ function renderReservations(reservations) {
         reservation.end_time,
       )}`;
 
+      let actionHtml = "—";
+
+      if (reservation.status === "Pending") {
+          actionHtml = `
+              <div class="reservation-actions">
+                  <button
+                      class="table-action"
+                      data-status-id="${reservation.reservation_id}"
+                      data-status="Confirmed">
+                      Confirm
+                  </button>
+
+                  <button
+                      class="table-action danger"
+                      data-status-id="${reservation.reservation_id}"
+                      data-status="Cancelled">
+                      Cancel
+                  </button>
+              </div>
+          `;
+      } else if (reservation.status === "Confirmed") {
+          actionHtml = `
+              <div class="reservation-actions">
+                  <button
+                      class="table-action"
+                      data-status-id="${reservation.reservation_id}"
+                      data-status="Seated">
+                      Seat
+                  </button>
+
+                  <button
+                      class="table-action danger"
+                      data-status-id="${reservation.reservation_id}"
+                      data-status="Cancelled">
+                      Cancel
+                  </button>
+              </div>
+          `;
+      }
+
       return `
             <tr>
 
@@ -461,24 +501,7 @@ function renderReservations(reservations) {
               </td>
 
               <td>
-                ${
-                  reservation.status !== "Cancelled" &&
-                  reservation.status !== "Seated"
-                    ? `
-                      <button
-                        type="button"
-                        class="table-action danger"
-                        data-cancel-id="${reservation.reservation_id}"
-                      >
-                        Cancel
-                      </button>
-                    `
-                    : `
-                      <span class="action-disabled">
-                        -
-                      </span>
-                    `
-                }
+                ${actionHtml}
               </td>
 
             </tr>
@@ -486,7 +509,7 @@ function renderReservations(reservations) {
     })
     .join("");
 
-  attachCancelHandlers();
+  attachStatusHandlers();
 }
 
 /* Cancel reservation */
@@ -532,6 +555,97 @@ function attachCancelHandlers() {
       cancelReservation(Number(button.dataset.cancelId));
     });
   });
+}
+
+async function updateReservationStatus(
+    reservationId,
+    newStatus
+) {
+    let message = `Change reservation #${reservationId} to ${newStatus}?`;
+
+    if (newStatus === "Cancelled") {
+        message = `Cancel reservation #${reservationId}?`;
+    }
+
+    if (newStatus === "Seated") {
+        message = `Mark reservation #${reservationId} as seated?`;
+    }
+
+    if (newStatus === "Confirmed") {
+        message = `Confirm reservation #${reservationId}?`;
+    }
+
+    const confirmed = window.confirm(message);
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `/api/reservations/${reservationId}/status`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    status: newStatus
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message ||
+                "Unable to update reservation status."
+            );
+        }
+
+        showMessage(
+            result.message ||
+            "Reservation status updated successfully.",
+            "success"
+        );
+
+        await loadReservations();
+
+    } catch (error) {
+        console.error(
+            "Reservation status update error:",
+            error
+        );
+
+        showMessage(
+            error.message,
+            "error"
+        );
+    }
+}
+
+function attachStatusHandlers() {
+    const buttons = document.querySelectorAll(
+        "[data-status-id]"
+    );
+
+    buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+
+            const reservationId = Number(
+                button.dataset.statusId
+            );
+
+            const newStatus =
+                button.dataset.status;
+
+            updateReservationStatus(
+                reservationId,
+                newStatus
+            );
+        });
+    });
 }
 
 /* Setup page events */

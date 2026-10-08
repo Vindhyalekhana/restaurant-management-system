@@ -1014,15 +1014,15 @@ python -m application.app
 
 From the project root:
 
-```powershell
+````powershell
 python -m application.web_app
-```
+```ko
 
 Then open:
 
 ```text
 http://127.0.0.1:5000/
-```
+````
 
 The web application exposes separate pages for Dashboard, Reservations, Tables, Orders, Kitchen, Billing, and Reports.
 
@@ -1432,4 +1432,3 @@ The current implementation successfully demonstrates:
 
 B.Tech Computer Science & Engineering  
 Specialization: Blockchain, IoT & Cybersecurity
-
